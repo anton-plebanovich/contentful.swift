@@ -1,4 +1,3 @@
-
 //
 //  File.swift
 //  Contentful
@@ -43,12 +42,10 @@ public struct DefaultDocumentRenderer: DocumentRenderer {
         self.styling = styling
     }
 
-
     public var baseContext: [CodingUserInfoKey: Any] {
         return [
             .styles: styling,
-            .indentLevel: 0,
-            .listItemContext: ListItemContext(level: 0)
+            .listContext: ListContext(level: 0, parentType: nil, itemIndex: 0, isFirstListItemChild: false)
         ]
     }
 

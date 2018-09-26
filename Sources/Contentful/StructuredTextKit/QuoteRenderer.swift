@@ -26,6 +26,7 @@ public struct QuoteRenderer: NodeRenderer {
 
         quoteString.addAttributes(attrs, range: NSRange(location: 0, length: quoteString.length))
         var rendered = [quoteString]
+        rendered.applyListItemStylingIfNecessary(node: node, context: context)
         rendered.appendNewlineIfNecessary(node: node)
         return rendered
     }

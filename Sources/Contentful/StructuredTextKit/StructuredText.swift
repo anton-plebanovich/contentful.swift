@@ -89,7 +89,6 @@ public enum NodeType: String, Decodable {
     case assetHyperlink = "asset-hyperlink"
     case entryHyperlink = "entry-hyperlink"
 
-
     internal var type: Node.Type {
         switch self {
         case .paragraph:
@@ -113,7 +112,7 @@ public enum NodeType: String, Decodable {
         case .hyperlink:
             return Hyperlink.self
         case .embeddedAssetBlock, .embeddedEntryBlock, .embeddedEntryInline, .assetHyperlink, .entryHyperlink:
-            return EmbeddedResource.self
+            return EmbeddedResourceBlock.self
         }
     }
 }
@@ -136,6 +135,23 @@ public class BlockNode: Node {
     }
 }
 
+public class InlineNode: Node {
+    public let nodeType: NodeType
+    public let nodeClass: NodeClass
+    public internal(set) var content: [Node]
+
+    required public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: NodeContentCodingKeys.self)
+        nodeType = try container.decode(NodeType.self, forKey: .nodeType)
+        nodeClass = try container.decode(NodeClass.self, forKey: .nodeClass)
+        content = try container.decodeContent(forKey: .content)
+    }
+    init(nodeType: NodeType, nodeClass: NodeClass, content: [Node]) {
+        self.nodeType = nodeType
+        self.nodeClass = nodeClass
+        self.content = content
+    }
+}
 /// The top level node which contains all other nodes.
 public class Document: Node {
     public let nodeType: NodeType
@@ -193,7 +209,7 @@ public final class Heading: BlockNode {
 }
 
 // TODO: Make an inline representation
-public class Hyperlink: BlockNode {
+public class Hyperlink: InlineNode {
 
     public let data: Hyperlink.Data
 
@@ -209,27 +225,19 @@ public class Hyperlink: BlockNode {
 }
 
 /// A block containing data for a linked entry.
-public class EmbeddedResource: Node {
-
-    public let nodeType: NodeType
-    public let nodeClass: NodeClass
-    public internal(set) var content: [Node]
+public class EmbeddedResourceBlock: BlockNode {
 
     public let data: EmbeddedResourceData
 
     internal init(resolvedData: EmbeddedResourceData, nodeType: NodeType, content: [Node]) {
         self.data = resolvedData
-        self.nodeType = nodeType
-        self.nodeClass = .block
-        self.content = content
+        super.init(nodeType: nodeType, nodeClass: .block, content: content)
     }
 
     public required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: NodeContentCodingKeys.self)
-        nodeType = try container.decode(NodeType.self, forKey: .nodeType)
-        nodeClass = try container.decode(NodeClass.self, forKey: .nodeClass)
         data = try container.decode(EmbeddedResourceData.self, forKey: .data)
-        content = try container.decodeContent(forKey: .content)
+        try super.init(from: decoder)
     }
 }
 

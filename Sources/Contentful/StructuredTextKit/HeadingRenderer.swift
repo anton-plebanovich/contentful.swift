@@ -11,7 +11,6 @@ import Foundation
 public struct HeadingRenderer: NodeRenderer {
 
     public func render(node: Node, renderer: DocumentRenderer, context: [CodingUserInfoKey: Any]) -> [NSMutableAttributedString] {
-
         let heading = node as! Heading
         var rendered = heading.content.reduce(into: [NSMutableAttributedString]()) { (rendered, node) in
             let nodeRenderer = renderer.renderer(for: node)
@@ -22,7 +21,7 @@ public struct HeadingRenderer: NodeRenderer {
         rendered.forEach {
             $0.addAttributes(context.styles.headingAttributes(level: Int(heading.level)), range: NSRange(location: 0, length: $0.length))
         }
-
+        rendered.applyListItemStylingIfNecessary(node: node, context: context)
         rendered.appendNewlineIfNecessary(node: node)
         return rendered
     }
