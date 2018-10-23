@@ -965,7 +965,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = $SRCROOT/Scripts/BuildPhases/SwiftLint.sh;
+			shellScript = "\"$SRCROOT/Scripts/BuildPhases/SwiftLint.sh\"\n";
 		};
 		EDA690D61F433BFA00581FC6 /* SwiftLint */ = {
 			isa = PBXShellScriptBuildPhase;
